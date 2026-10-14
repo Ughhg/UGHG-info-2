@@ -52,18 +52,23 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
-          "builder": "@angular/build:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "ughg-info:build:production"
-            },
-            "development": {
-              "buildTarget": "ughg-info:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
+      "serve": {
+  "builder": "@angular/build:dev-server",
+  "options": {
+    "allowedHosts": [
+      "mountain-heroes-charity-devoted.trycloudflare.com"
+    ]
+  },
+  "configurations": {
+    "production": {
+      "buildTarget": "ughg-info:build:production"
+    },
+    "development": {
+      "buildTarget": "ughg-info:build:development"
+    }
+  },
+  "defaultConfiguration": "development"
+},
         "test": {
           "builder": "@angular/build:unit-test"
         }
