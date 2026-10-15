@@ -1,361 +1,161 @@
-<div dir="rtl" class="flex min-h-screen flex-col overflow-x-hidden bg-[#092217] font-cairo text-[#e2e8f0] antialiased selection:bg-[#f59e0b]/30 selection:text-white">
+<header id="about" class="hero">
+  <div class="glow"></div>
+  <nav class="nav container">
+    <div class="brand">
+      <img class="logo" src="logo.jpg" alt="شعار UGHG Investment Group">
+      <div>
+        <strong>UGHG</strong>
+        <span>Investment Group</span>
+      </div>
+    </div>
 
-  <!-- Header / Navigation -->
-  <header id="about" class="border-b border-[#113a29] bg-[#071912] text-white">
-    <nav class="sticky top-0 z-50 border-b border-white/10 bg-[#071912]/90 backdrop-blur-md">
-      <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8 lg:px-12">
-        <a href="#about" class="flex items-center gap-3.5 no-underline">
-          <span class="flex flex-col">
-            <img
-              src="LOGO.png"
-              alt="UGHG Group"
-              class="h-12 w-auto max-w-[180px] object-contain object-right"
-            />
-          </span>
-        </a>
+    <div class="nav-links">
+      <a class="nav-item" href="#about">من نحن</a>
+      <a class="nav-item" href="#company">بيانات الشركة</a>
+      <a class="nav-item" href="#compliance">الالتزام القانوني</a>
+      <a class="nav-link" href="#sectors">مجالات العمل</a>
+    </div>
 
-        <!-- Desktop Menu -->
-        <div class="hidden items-center gap-8 md:flex">
-          <a href="#about" class="text-sm font-medium text-slate-300 transition-all hover:text-[#f59e0b]">من نحن</a>
-          <a href="#sectors" class="text-sm font-medium text-slate-300 transition-all hover:text-[#f59e0b]">قطاعات العمل</a>
-          <a href="#compliance" class="text-sm font-medium text-slate-300 transition-all hover:text-[#f59e0b]">الالتزام القانوني</a>
-          <a href="#sectors" class="inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] px-5 py-2.5 text-sm font-bold text-[#071912] shadow-lg shadow-[#f59e0b]/20 transition-all hover:opacity-95 hover:scale-[1.02]">
-            <span>استكشف القطاعات</span>
-            <svg class="h-4 w-4 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </a>
-        </div>
+    <button
+      class="menu-btn"
+      type="button"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="mobileMenuOpen()"
+      aria-label="القائمة الرئيسية"
+    >
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round">
+        @if (mobileMenuOpen()) {
+          <path d="m6 6 12 12M18 6 6 18" />
+        } @else {
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        }
+      </svg>
+    </button>
+  </nav>
 
-        <!-- Mobile Menu Button -->
+  @if (mobileMenuOpen()) {
+    <div class="mobile-menu container">
+      <a href="#about" (click)="closeMobileMenu()">من نحن</a>
+      <a href="#sectors" (click)="closeMobileMenu()">مجالات العمل</a>
+      <a href="#company" (click)="closeMobileMenu()">بيانات الشركة</a>
+      <a href="#compliance" (click)="closeMobileMenu()">الالتزام القانوني</a>
+    </div>
+  }
+
+  <div class="hero-body container">
+    <p class="eyebrow">تعرّف علينا</p>
+    <h1>شركة واحدة،<br />مجالات عمل متكاملة.</h1>
+    <p class="lead">
+      من الاستثمار والتطوير العقاري، للذكاء الاصطناعي والتحول الرقمي، للتسويق والتجارة
+      ومراكز الاتصال — بنقدّم خدماتنا وفقاً للقوانين والأنظمة المعمول بها.
+    </p>
+    <div class="stats">
+      <div><b>{{ sectors.length }}</b><span>قطاعات رئيسية</span></div>
+      <div><b>{{ totalActivitiesCount }}</b><span>نشاط معتمد</span></div>
+      <div><b>2024</b><span>سنة التأسيس</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="sheet">
+  <section id="sectors" class="container">
+    <div class="section-head">
+      <h2 class="section-title">مجالات العمل</h2>
+      <div class="search">
+        <input
+          type="search"
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+          placeholder="ابحث في القطاعات والأنشطة..."
+          aria-label="بحث في القطاعات والأنشطة"
+        />
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />
+        </svg>
+      </div>
+    </div>
+
+    @if (filteredSectors().length === 0) {
+      <div class="empty">
+        <p>لا توجد نتائج مطابقة لبحثك.</p>
+        <button type="button" (click)="clearSearch()">عرض كل القطاعات</button>
+      </div>
+    }
+
+    <div class="grid">
+      @for (sector of filteredSectors(); track sector.id) {
         <button
-          (click)="toggleMobileMenu()"
+          class="card"
+          [class.active]="sector.id === activeSector()?.id"
+          (click)="selectSector(sector.id)"
           type="button"
-          class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2.5 text-white transition-colors hover:bg-white/10 md:hidden"
-          [attr.aria-expanded]="mobileMenuOpen"
-          aria-label="القائمة الرئيسية"
         >
-          @if (!mobileMenuOpen) {
-            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M4 7h16M4 12h16M4 17h16"/>
+          <span class="icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path [attr.d]="iconPaths[sector.icon]" />
             </svg>
-          } @else {
-            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="m6 6 12 12M18 6 6 18"/>
-            </svg>
-          }
+          </span>
+          <h3>{{ sector.title }}</h3>
+          <p>{{ sector.description }}</p>
+          <span class="count">{{ sector.activities.length === 1 ? 'نشاط واحد' : sector.activities.length + ' أنشطة' }}</span>
         </button>
-      </div>
-
-      <!-- Mobile Dropdown Menu -->
-      @if (mobileMenuOpen) {
-        <div class="border-t border-white/10 bg-[#071912] px-5 py-5 md:hidden">
-          <div class="flex flex-col gap-2">
-            <a (click)="closeMobileMenu()" href="#about" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-[#f59e0b]">من نحن</a>
-            <a (click)="closeMobileMenu()" href="#sectors" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-[#f59e0b]">قطاعات العمل</a>
-            <a (click)="closeMobileMenu()" href="#compliance" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-[#f59e0b]">الالتزام القانوني</a>
-          </div>
-        </div>
       }
-    </nav>
-
-    <!-- Hero Section -->
-    <div class="relative mx-auto max-w-7xl px-5 pb-24 pt-20 sm:px-8 sm:pb-32 sm:pt-28 lg:px-12">
-      <!-- Background Glow Effect matching logo amber -->
-      <div class="absolute right-1/4 top-10 h-72 w-72 rounded-full bg-[#f59e0b]/10 blur-3xl pointer-events-none"></div>
-      
-      <div class="relative max-w-4xl">
-        <div class="inline-flex items-center gap-2.5 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/10 px-4 py-2 text-xs font-bold text-[#fbbf24]">
-          <span class="h-2 w-2 rounded-full bg-[#f59e0b] animate-pulse"></span>
-          <span>مجموعة متخصصة ومتعددة المجالات</span>
-        </div>
-
-        <h1 class="mt-8 text-4xl font-black leading-[1.3] tracking-tight text-white sm:text-6xl lg:text-7xl">
-          شركة واحدة،
-          <br/>
-          <span class="bg-gradient-to-r from-[#fbbf24] via-[#f59e0b] to-[#d97706] bg-clip-text text-transparent">مجالات عمل متكاملة.</span>
-        </h1>
-
-        <p class="mt-6 max-w-2xl text-base leading-loose text-slate-300 sm:text-lg">
-          من الاستثمار والتطوير العقاري، إلى حلول الذكاء الاصطناعي والتحول الرقمي، والتسويق والتجارة ومراكز الاتصال — بنقدّم خدماتنا وفقاً للقوانين والأنظمة المعمول بها برؤية استراتيجية مستدامة.
-        </p>
-
-        <!-- Stats Grid -->
-        <div class="mt-12 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
-          <div class="rounded-2xl border border-white/10 bg-[#0d2e20]/60 p-6 backdrop-blur-sm transition-all hover:border-[#f59e0b]/40">
-            <div class="flex items-baseline gap-1">
-              <b class="text-3xl font-black text-[#fbbf24]">{{ sectors.length }}</b>
-              <span class="font-bold text-[#fbbf24]">+</span>
-            </div>
-            <span class="mt-2 block text-xs font-medium text-slate-300">قطاعات استراتيجية</span>
-          </div>
-
-          <div class="rounded-2xl border border-white/10 bg-[#0d2e20]/60 p-6 backdrop-blur-sm transition-all hover:border-[#f59e0b]/40">
-            <div class="flex items-baseline gap-1">
-              <b class="text-3xl font-black text-[#fbbf24]">{{ totalActivitiesCount }}</b>
-              <span class="font-bold text-[#fbbf24]">+</span>
-            </div>
-            <span class="mt-2 block text-xs font-medium text-slate-300">نشاط مسجل بالبيانات</span>
-          </div>
-
-          <div class="rounded-2xl border border-white/10 bg-[#0d2e20]/60 p-6 backdrop-blur-sm transition-all hover:border-[#f59e0b]/40">
-            <b class="text-3xl font-black text-[#fbbf24]">100%</b>
-            <span class="mt-2 block text-xs font-medium text-slate-300">الالتزام بالأنظمة والقوانين</span>
-          </div>
-        </div>
-      </div>
     </div>
-  </header>
+  </section>
 
-  <!-- Main Content -->
-  <main class="mx-auto w-full max-w-7xl flex-grow px-4 pb-24 pt-8 sm:px-8 lg:px-12">
-    <!-- Sectors Section -->
-    <section id="sectors" class="-mt-12 rounded-3xl border border-[#113a29] bg-[#0b2b1d] p-6 shadow-2xl sm:p-8 lg:p-10 backdrop-blur-xl">
-      <div class="flex flex-col justify-between gap-6 border-b border-white/10 pb-8 md:flex-row md:items-end">
-        <div>
-          <div class="mb-3 inline-flex items-center gap-2 rounded-lg bg-[#f59e0b]/10 px-3 py-1 text-xs font-bold text-[#fbbf24]">
-            <span class="h-2 w-2 rounded-full bg-[#f59e0b]"></span>
-            أنشطتنا المعتمدة
-          </div>
-          <h2 class="text-2xl font-black text-white sm:text-3xl">مجالات العمل والقطاعات</h2>
-          <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-            استكشف قطاعات المجموعة وابحث بالاسم عن القطاع أو أي نشاط من أنشطته.
-          </p>
-        </div>
-
-        <!-- Search & Filter Controls -->
-        <div class="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
-          <div class="relative w-full sm:w-80">
-            <input
-              type="search"
-              [value]="searchQuery"
-              (input)="searchQuery = $any($event.target).value"
-              placeholder="بحث في الأنشطة والقطاعات..."
-              class="w-full rounded-xl border border-white/15 bg-[#071912] py-3.5 pl-4 pr-11 text-sm text-white placeholder-slate-400 outline-none transition-all focus:border-[#f59e0b] focus:ring-2 focus:ring-[#f59e0b]/20"
-            />
-            <svg class="absolute right-4 top-4 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="7"/>
-              <path d="m20 20-4-4"/>
-            </svg>
-          </div>
-
-          @if (searchQuery !== '' || activeSectorId !== null) {
-            <button
-              type="button"
-              (click)="resetFilters()"
-              class="rounded-xl border border-white/15 bg-white/5 px-5 py-3.5 text-xs font-bold text-slate-200 transition-all hover:bg-white/15 hover:text-white"
-            >
-              إعادة ضبط
-            </button>
-          }
-        </div>
+  @if (activeSector(); as sector) {
+    <section id="details" class="container details">
+      <div class="details-head">
+        <h2>{{ sector.title }}</h2>
+        <p>{{ sector.description }}</p>
       </div>
-
-      <!-- Sectors Grid -->
-      <div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        @for (sector of filteredSectors; track sector.id) {
-          <button
-            type="button"
-            (click)="selectSector(sector.id)"
-            [attr.aria-expanded]="isSectorActive(sector.id)"
-            [attr.aria-controls]="'panel-' + sector.id"
-            class="group relative flex cursor-pointer flex-col justify-between rounded-2xl border p-6 text-right transition-all duration-300 sm:p-7"
-            [class.border-[#f59e0b]]="isSectorActive(sector.id)"
-            [class.bg-[#0f3626]]="isSectorActive(sector.id)"
-            [class.shadow-xl]="isSectorActive(sector.id)"
-            [class.shadow-[#f59e0b]/10]="isSectorActive(sector.id)"
-            [class.border-white/10]="!isSectorActive(sector.id)"
-            [class.bg-[#0d2e20]]="!isSectorActive(sector.id)"
-            [class.hover:border-[#f59e0b]/50]="!isSectorActive(sector.id)"
-            [class.hover:bg-[#0f3626]]="!isSectorActive(sector.id)"
-          >
+      <ul class="activities">
+        @for (activity of sector.activities; track activity.name; let i = $index) {
+          <li>
+            <span class="num">{{ i + 1 }}</span>
             <div>
-              <div
-                class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-300"
-                [class.border-[#f59e0b]]="isSectorActive(sector.id)"
-                [class.bg-[#f59e0b]]="isSectorActive(sector.id)"
-                [class.text-[#071912]]="isSectorActive(sector.id)"
-                [class.border-white/10]="!isSectorActive(sector.id)"
-                [class.bg-white/5]="!isSectorActive(sector.id)"
-                [class.text-[#fbbf24]]="!isSectorActive(sector.id)"
-              >
-                @switch (sector.icon) {
-                  @case ('building-2') {
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6M9 10h.01M15 10h.01"/>
-                    </svg>
-                  }
-                  @case ('cpu') {
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="6" y="6" width="12" height="12" rx="2"/>
-                      <path d="M9 9h6v6H9zM9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/>
-                    </svg>
-                  }
-                  @case ('megaphone') {
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8M19 5a9 9 0 0 1 0 14"/>
-                    </svg>
-                  }
-                  @case ('truck') {
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 6h11v12H3z"/>
-                      <path d="M14 10h4l3 4v4h-7z"/>
-                      <circle cx="7.5" cy="18" r="2"/>
-                      <circle cx="17.5" cy="18" r="2"/>
-                      <path d="M17 10v4h4"/>
-                    </svg>
-                  }
-                  @case ('headset') {
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M4 14v-3a8 8 0 0 1 16 0v3"/>
-                      <path d="M4 13h3v6H6a2 2 0 0 1-2-2v-4zM20 13h-3v6h1a2 2 0 0 0 2-2v-4zM17 19a5 5 0 0 1-5 3"/>
-                    </svg>
-                  }
-                }
-              </div>
-
-              <h3 class="text-lg font-bold text-white transition-colors group-hover:text-[#fbbf24]">{{ sector.title }}</h3>
-              <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-300">{{ sector.description }}</p>
+              <strong>{{ activity.name }}</strong>
+              <p>{{ activity.description }}</p>
             </div>
-
-            <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
-              <span
-                class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold"
-                [class.bg-[#f59e0b]/20]="isSectorActive(sector.id)"
-                [class.text-[#fbbf24]]="isSectorActive(sector.id)"
-                [class.bg-white/5]="!isSectorActive(sector.id)"
-                [class.text-slate-300]="!isSectorActive(sector.id)"
-              >
-                <span>{{ sector.activities.length }}</span>
-                <span>{{ sector.activities.length === 1 ? 'نشاط واحد' : 'أنشطة معتمدة' }}</span>
-              </span>
-
-              <span class="flex items-center gap-1.5 text-xs font-bold transition-colors" [class.text-[#fbbf24]]="isSectorActive(sector.id)" [class.text-slate-400]="!isSectorActive(sector.id)">
-                التفاصيل
-                <svg class="h-4 w-4 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </span>
-            </div>
-          </button>
+          </li>
         }
-      </div>
-
-      <!-- No Results State -->
-      @if (filteredSectors.length === 0) {
-        <div class="py-20 text-center">
-          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-300">
-            <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="10.5" cy="10.5" r="6.5"/>
-              <path d="m16 16 4 4M8 9l5 3m0-3-5 3"/>
-            </svg>
-          </div>
-          <h3 class="text-lg font-bold text-white">لم يتم العثور على نتائج</h3>
-          <p class="mt-1 text-sm text-slate-300">جرّب البحث بكلمات أخرى.</p>
-          <button type="button" (click)="resetFilters()" class="mt-5 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] px-6 py-3 text-xs font-bold text-[#071912] shadow-lg shadow-[#f59e0b]/20 transition-all hover:opacity-95">
-            إعادة عرض الكل
-          </button>
-        </div>
-      }
+      </ul>
     </section>
+  }
 
-    <!-- Sector Details Panel -->
-    <section id="details" class="mt-8 scroll-mt-8">
-      @for (sector of sectors; track sector.id) {
-        @if (isSectorActive(sector.id)) {
-          <div [id]="'panel-' + sector.id" class="overflow-hidden rounded-3xl border border-[#f59e0b]/30 bg-[#0b2b1d] shadow-2xl animate-fadeIn">
-            <div class="bg-gradient-to-r from-[#0d3322] to-[#071912] px-6 py-8 text-white sm:px-10 sm:py-10 border-b border-white/10">
-              <div class="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-                <div>
-                  <div class="mb-3 flex items-center gap-2 text-xs font-bold text-[#fbbf24]">
-                    <span>قطاع استراتيجي</span>
-                    <span>•</span>
-                    <span>{{ sector.activities.length }} أنشطة مسجلة</span>
-                  </div>
-                  <h3 class="text-2xl font-black text-white sm:text-4xl">{{ sector.title }}</h3>
-                  <p class="mt-3 max-w-3xl text-sm leading-loose text-slate-200 sm:text-base">{{ sector.description }}</p>
-                </div>
-
-                <button type="button" (click)="activeSectorId = null" class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-xs font-bold text-white transition-all hover:bg-white/15 hover:border-white/40 md:self-center">
-                  <span>إغلاق التفاصيل</span>
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m6 6 12 12M18 6 6 18"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div class="p-6 sm:p-10 bg-[#0b2b1d]">
-              <h4 class="mb-6 flex items-center gap-2.5 text-sm font-bold text-slate-200">
-                <svg class="h-5 w-5 text-[#fbbf24]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m9 12 2 2 4-4"/>
-                  <circle cx="12" cy="12" r="9"/>
-                </svg>
-                قائمة الأنشطة والخدمات التابعة لهذا القطاع
-              </h4>
-
-              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                @for (activity of sector.activities; track activity; let i = $index) {
-                  <div class="flex items-start gap-4 rounded-2xl border border-white/10 bg-[#0d2e20] p-4.5 transition-all hover:border-[#f59e0b]/40 hover:bg-[#0f3626]">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f59e0b]/15 text-xs font-bold text-[#fbbf24] border border-[#f59e0b]/30">{{ i + 1 }}</span>
-                    <span class="pt-1 text-sm font-semibold leading-relaxed text-slate-100">{{ activity }}</span>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-        }
-      }
-    </section>
-
-    <!-- Compliance Section -->
-    <section id="compliance" class="mt-8">
-      <div class="rounded-3xl border border-white/10 bg-[#0b2b1d] p-6 sm:p-8 lg:p-10 shadow-xl">
-        <div class="flex flex-col items-start gap-6 sm:flex-row">
-          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[#f59e0b]/30 bg-[#f59e0b]/10 text-[#fbbf24]">
-            <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m9 12 2 2 4-4"/>
-              <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/>
-            </svg>
-          </div>
-
-          <div>
-            <div class="mb-3 inline-flex rounded-lg bg-[#f59e0b]/10 px-3 py-1 text-xs font-bold text-[#fbbf24]">
-              التزام شفاف ومسؤول
-            </div>
-            <h3 class="text-xl font-extrabold text-white sm:text-2xl">تنويه وإشعار قانوني</h3>
-            <p class="mt-3 text-sm leading-loose text-slate-300 sm:text-base">
-              تلتزم الشركة بأحكام القانون رقم 121 لسنة 1982 في شأن سجل المستوردين، ولا تمارس أي نشاط إلا بعد الحصول على التراخيص اللازمة من الجهات المختصة وبما لا يخل بأحكام القوانين المنظمة.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="mt-auto border-t border-[#113a29] bg-[#071912] text-slate-300">
-    <div class="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12">
-      <div class="flex flex-col items-center justify-between gap-6 border-b border-white/10 pb-8 md:flex-row">
-        <a href="#about" class="flex items-center gap-3">
-          <img
-            src="LOGO.png"
-            alt="UGHG Group"
-            class="h-12 w-auto max-w-[180px] object-contain object-right"
-          />
-        </a>
-
-        <div class="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm font-medium">
-          <a href="#about" class="transition-colors hover:text-[#fbbf24]">من نحن</a>
-          <a href="#sectors" class="transition-colors hover:text-[#fbbf24]">مجالات العمل</a>
-          <a href="#compliance" class="transition-colors hover:text-[#fbbf24]">الالتزام القانوني</a>
-        </div>
-      </div>
-
-      <div class="flex flex-col items-center justify-between gap-4 pt-8 text-xs text-slate-400 sm:flex-row">
-        <p>© {{ currentYear }} <strong class="text-white">UGHG</strong> جميع الحقوق محفوظة.</p>
-        <p>مجموعة متعددة الأنشطة وفقاً للأنظمة والقوانين المعمول بها.</p>
+  <section id="company" class="container">
+    <div class="company">
+      <img src="logo.jpg" alt="شعار UGHG Investment Group">
+      <div>
+        <h2>بيانات الشركة</h2>
+        <dl class="facts">
+          @for (fact of companyFacts; track fact.label) {
+            <div><dt>{{ fact.label }}</dt><dd>{{ fact.value }}</dd></div>
+          }
+        </dl>
       </div>
     </div>
-  </footer>
-</div>
+  </section>
+
+  <section id="compliance" class="container">
+    <div class="notice">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" /><path d="M9 12l2 2 4-4" />
+      </svg>
+      <p>
+        تلتزم الشركة بأحكام القانون رقم 121 لسنة 1982 في شأن سجل المستوردين، ولا تمارس
+        أي نشاط إلا بعد الحصول على التراخيص اللازمة من الجهات المختصة وبما لا يخل بأحكام
+        القوانين المنظمة.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer container">
+  <span>© {{ currentYear }} UGHG Investment Group</span>
+  <span>سجل تجاري رقم 242287 · جميع الحقوق محفوظة</span>
+</footer>
